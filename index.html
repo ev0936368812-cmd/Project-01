@@ -1,18 +1,30 @@
-<!DOCTYPE html>
 <html>
-<head>
-  <title>Wifi Map</title>
-  <meta name="viewport" content="initial-scale=1.0">
-  <meta charset="utf-8">
-
-    <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
-</head>
-<body>
-  <div id="map"></div>
-  
-  /*google 地圖程式載入*/
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAU1TGpRMS2lZZ0vbTPtAJapWcsLVnN2MU&callback=initMap" async
-    defer></script>
-    
-</body>
+    <head>
+        <title>Add a Map with Markers using HTML</title>
+        <style>
+            gmp-map {
+                height: 100%;
+            }
+            html,
+            body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+        <script type="module" src="./index.js"></script>
+        <script
+            async
+            src="https://maps.googleapis.com/maps/api/js?loading=async&key=AIzaSyA6myHzS10YXdcazAFalmXvDkrYCp5cLc8&libraries=maps,marker"></script>
+    </head>
+    <body>
+        <gmp-map
+            center="41.027748173921374, -92.41852445367961"
+            zoom="13"
+            map-id="DEMO_MAP_ID">
+            <gmp-advanced-marker
+                position="41.027748173921374, -92.41852445367961"
+                title="Ottumwa, IA"></gmp-advanced-marker>
+        </gmp-map>
+    </body>
 </html>
