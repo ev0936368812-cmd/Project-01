@@ -1,30 +1,188 @@
-<html>
-    <head>
-        <title>Add a Map with Markers using HTML</title>
-        <style>
-            gmp-map {
-                height: 100%;
-            }
-            html,
-            body {
-                height: 100%;
-                margin: 0;
-                padding: 0;
-            }
-        </style>
-        <script type="module" src="./index.js"></script>
-        <script
-            async
-            src="https://maps.googleapis.com/maps/api/js?loading=async&key=AIzaSyA6myHzS10YXdcazAFalmXvDkrYCp5cLc8&libraries=maps,marker"></script>
-    </head>
-    <body>
-        <gmp-map
-            center="41.027748173921374, -92.41852445367961"
-            zoom="13"
-            map-id="DEMO_MAP_ID">
-            <gmp-advanced-marker
-                position="41.027748173921374, -92.41852445367961"
-                title="Ottumwa, IA"></gmp-advanced-marker>
-        </gmp-map>
-    </body>
+To make a fantastic, fully-functional map with multiple custom markers, interactive pop-up info windows, and custom styling (like hiding distracting businesses) all inside a single GitHub-ready file, you have to use a standard structural web practice: combining the layout (**HTML**), the styles (**CSS**), and the map logic (**JavaScript**) together into one `.html` file.
+
+The Google Maps API requires JavaScript to calculate the coordinates and render the actual map elements, but by embedding it all directly into a single HTML structure using `<style>` and `<script>` tags, you can copy and paste this entire code block straight into your GitHub repository as a standalone HTML page.
+
+Here is the complete, unshortened HTML code containing all the feature definitions, layout structures, and styling logic combined:
+
+```html
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Maps API Custom Map</title>
+  
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  
+  <style>
+    /* Custom spacing and responsive sizing for the map container */
+    .map-container {
+      margin-top: 30px;
+      margin-bottom: 20px;
+    }
+    .btn-group-custom {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    /* Ensures the map takes up proper height if bootstrap classes are modified */
+    #map {
+      min-height: 450px;
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app" class="container">
+    <div class="row">
+      <div class="col-12 text-center my-4">
+        <h2>My Custom Interactive Map</h2>
+        <p>Click the location buttons below or click the map markers directly to view information.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 text-center btn-group-custom">
+        <button type="button" class="btn btn-outline-secondary" onclick="openInfoWindowById(1)">
+          臺北市政府親子劇場
+        </button>
+        <button type="button" class="btn btn-outline-secondary" onclick="openInfoWindowById(2)">
+          誠品信義店
+        </button>
+        <button type="button" class="btn btn-outline-secondary" onclick="openInfoWindowById(3)">
+          蔦屋書店信義店
+        </button>
+      </div>
+    </div>
+
+    <div class="row map-container">
+      <div class="col-12">
+        <div id="map"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let map;
+    // Object to keep track of all info windows so they can be triggered via HTML buttons
+    const infowindowAll = {};
+
+    // Hardcoded GeoJSON location data defining coordinates, names, and address descriptions
+    const mapData = {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [25.0374865, 121.5647688]
+          },
+          "properties": {
+            "id": 1,
+            "name": "臺北市政府親子劇場",
+            "site": "110台北市信義區市府路1號市府大樓"
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [25.0397146, 121.5653771]
+          },
+          "properties": {
+            "id": 2,
+            "name": "誠品信義店",
+            "site": "110台北市信義區松高路11號"
+          }
+        },
+        {
+          "type": "Feature",
+          "geometry": {
+            "type": "Point",
+            "coordinates": [25.0405919, 121.5647644]
+          },
+          "properties": {
+            "id": 3,
+            "name": "蔦屋書店信義店",
+            "site": "110台北市信義區忠孝東路五段8號"
+          }
+        }
+      ]
+    };
+
+    // Style rules configuration to make the map look clean by hiding surrounding commercial businesses
+    const cleanMapStyle = [
+      {
+        featureType: 'poi.business',
+        stylers: [
+          { visibility: 'off' }
+        ]
+      }
+    ];
+
+    // Core function initialized by the Google Maps script callback
+    function initMap() {
+      // Default center point configuration (Taipei City Hall area)
+      const defaultLocation = { lat: 25.0374865, lng: 121.5647688 };
+
+      // Map Initialization settings
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: defaultLocation,
+        zoom: 16,
+        mapTypeId: 'roadmap',
+        styles: cleanMapStyle, // Injecting the clean style array definitions
+        mapTypeControl: false,  // Hides standard UI selection toggle for cleaner aesthetics
+        fullscreenControl: true
+      });
+
+      // Loop through all feature elements to place fantastic custom markers and associate popup window content
+      mapData.features.forEach(function(r) {
+        // Formulate coordinates mapping geometry indexes (lat/lng orientation conversion)
+        const latLng = new google.maps.LatLng(r.geometry.coordinates[0], r.geometry.coordinates[1]);
+        
+        // Define marker instance with stylized attributes, drops animation, and customized display symbols
+        const marker = new google.maps.Marker({
+          position: latLng,
+          map: map,
+          animation: google.maps.Animation.DROP,
+          // Custom external icon graphic source definition
+          icon: "https://akveo.github.io/eva-icons/outline/png/128/gift-outline.png"
+        });
+
+        // Setup the localized popup HTML window content block
+        const infowindow = new google.maps.InfoWindow({
+          content: `<div style="padding:10px;"><h6>${r.properties.name}</h6><p style="margin:0; font-size:13px; color:#666;">${r.properties.site}</p></div>`
+        });
+
+        // Listen for direct clicks on the specific graphical map marker symbols
+        marker.addListener('click', function() {
+          infowindow.open(map, marker);
+        });
+
+        // Register action triggers to the global tracking object to connect with HTML button onclick rules
+        infowindowAll[r.properties.id] = {
+          open: function() {
+            infowindow.open(map, marker);
+          }
+        };
+      });
+    }
+
+    // Function executed whenever an HTML control button is triggered
+    function openInfoWindowById(id) {
+      if (infowindowAll[id]) {
+        infowindowAll[id].open();
+      }
+    }
+  </script>
+
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6X_jnYl1SBCbEPMiiTEHOCAudU3J451M&callback=initMap"></script>
+
+</body>
 </html>
+
+```
